@@ -322,10 +322,18 @@ func createServerWithEndpoint() (server *configtypes.Server, err error) { // nol
 		return
 	}
 	if isGlobalServer(endpoint) {
-		server = &configtypes.Server{ // nolint:staticcheck // Deprecated
-			Name:       name,
-			Type:       configtypes.GlobalServerType, // nolint:staticcheck // Deprecated
-			GlobalOpts: &configtypes.GlobalServer{Endpoint: sanitizeEndpoint(endpoint)},
+		if strings.Contains(endpoint, "tmc") {
+			server = &configtypes.Server{ // nolint:staticcheck // Deprecated
+				Name:       name,
+				Type:       configtypes.GlobalServerType, // nolint:staticcheck // Deprecated
+				GlobalOpts: &configtypes.GlobalServer{Endpoint: sanitizeEndpoint(endpoint)},
+			}
+		} else {
+			server = &configtypes.Server{ // nolint:staticcheck // Deprecated
+				Name:       name,
+				Type:       configtypes.ServerType(configtypes.TargetTSM), // nolint:staticcheck // Deprecated
+				GlobalOpts: &configtypes.GlobalServer{Endpoint: sanitizeEndpoint(endpoint)},
+			}
 		}
 	} else {
 		// While this would add an extra HTTP round trip, it avoids the need to

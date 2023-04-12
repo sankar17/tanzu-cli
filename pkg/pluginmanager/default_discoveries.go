@@ -32,6 +32,8 @@ func defaultDiscoverySourceBasedOnContext(context *configtypes.Context) []config
 		defaultDiscoveries = append(defaultDiscoveries, defaultDiscoverySourceForK8sTargetedContext(context.Name, context.ClusterOpts.Path, context.ClusterOpts.Context))
 	} else if context.Target == configtypes.TargetTMC && context.GlobalOpts != nil {
 		defaultDiscoveries = append(defaultDiscoveries, defaultDiscoverySourceForTMCTargetedContext(context))
+	} else if context.Target == configtypes.TargetTSM && context.GlobalOpts != nil {
+		defaultDiscoveries = append(defaultDiscoveries, defaultDiscoverySourceForTSMTargetedContext(context))
 	}
 	return defaultDiscoveries
 }
@@ -47,6 +49,16 @@ func defaultDiscoverySourceForK8sTargetedContext(name, kubeconfig, context strin
 }
 
 func defaultDiscoverySourceForTMCTargetedContext(context *configtypes.Context) configtypes.PluginDiscovery {
+	return configtypes.PluginDiscovery{
+		REST: &configtypes.GenericRESTDiscovery{
+			Name:     fmt.Sprintf("default-%s", context.Name),
+			Endpoint: appendURLScheme(context.GlobalOpts.Endpoint),
+			BasePath: "v1alpha1/system/binaries/plugins",
+		},
+	}
+}
+
+func defaultDiscoverySourceForTSMTargetedContext(context *configtypes.Context) configtypes.PluginDiscovery {
 	return configtypes.PluginDiscovery{
 		REST: &configtypes.GenericRESTDiscovery{
 			Name:     fmt.Sprintf("default-%s", context.Name),

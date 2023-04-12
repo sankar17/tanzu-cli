@@ -309,10 +309,18 @@ func createContextWithEndpoint() (context *configtypes.Context, err error) {
 	}
 
 	if isGlobalContext(endpoint) || selfManaged {
-		context = &configtypes.Context{
-			Name:       ctxName,
-			Target:     configtypes.TargetTMC,
-			GlobalOpts: &configtypes.GlobalServer{Endpoint: sanitizeEndpoint(endpoint)},
+		if strings.Contains(endpoint, "tmc") {
+			context = &configtypes.Context{
+				Name:       ctxName,
+				Target:     configtypes.TargetTMC,
+				GlobalOpts: &configtypes.GlobalServer{Endpoint: sanitizeEndpoint(endpoint)},
+			}
+		} else {
+			context = &configtypes.Context{
+				Name:       ctxName,
+				Target:     configtypes.TargetTSM,
+				GlobalOpts: &configtypes.GlobalServer{Endpoint: sanitizeEndpoint(endpoint)},
+			}
 		}
 	} else {
 		// While this would add an extra HTTP round trip, it avoids the need to
@@ -750,6 +758,8 @@ func displayContextListOutputListView(cfg *configtypes.ClientConfig, writer io.W
 		switch ctx.Target {
 		case configtypes.TargetTMC:
 			ep = ctx.GlobalOpts.Endpoint
+		case configtypes.TargetTSM:
+			ep = ctx.GlobalOpts.Endpoint
 		default:
 			ep = ctx.ClusterOpts.Endpoint
 			path = ctx.ClusterOpts.Path
@@ -765,6 +775,7 @@ func displayContextListOutputSplitViewTarget(cfg *configtypes.ClientConfig, writ
 
 	outputWriterK8sTarget := component.NewOutputWriter(writer, outputFormat, "Name", "IsActive", "Endpoint", "KubeConfigPath", "KubeContext")
 	outputWriterTMCTarget := component.NewOutputWriter(writer, outputFormat, "Name", "IsActive", "Endpoint")
+	outputWriterTSMTarget := component.NewOutputWriter(writer, outputFormat, "Name", "IsActive", "Endpoint")
 	for _, ctx := range cfg.KnownContexts {
 		if target != configtypes.TargetUnknown && ctx.Target != target {
 			continue
@@ -779,6 +790,9 @@ func displayContextListOutputSplitViewTarget(cfg *configtypes.ClientConfig, writ
 		case configtypes.TargetTMC:
 			ep = ctx.GlobalOpts.Endpoint
 			outputWriterTMCTarget.AddRow(ctx.Name, isCurrent, ep)
+		case configtypes.TargetTSM:
+			ep = ctx.GlobalOpts.Endpoint
+			outputWriterTSMTarget.AddRow(ctx.Name, isCurrent, ep)
 		default:
 			ep = ctx.ClusterOpts.Endpoint
 			path = ctx.ClusterOpts.Path
@@ -796,5 +810,9 @@ func displayContextListOutputSplitViewTarget(cfg *configtypes.ClientConfig, writ
 	if target == configtypes.TargetUnknown || target == configtypes.TargetTMC {
 		_, _ = cyanBold.Println("Target: ", cyanBoldItalic.Sprintf("%s", configtypes.TargetTMC))
 		outputWriterTMCTarget.Render()
+	}
+	if target == configtypes.TargetUnknown || target == configtypes.TargetTSM {
+		_, _ = cyanBold.Println("Target: ", cyanBoldItalic.Sprintf("%s", configtypes.TargetTSM))
+		outputWriterTSMTarget.Render()
 	}
 }

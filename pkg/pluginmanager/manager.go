@@ -284,6 +284,8 @@ func discoverServerPluginsBasedOnAllCurrentContexts() ([]discovery.Discovered, e
 			switch context.Target {
 			case configtypes.TargetTMC:
 				discoveredPlugins[i].Target = configtypes.TargetTMC
+			case configtypes.TargetTSM:
+				discoveredPlugins[i].Target = configtypes.TargetTSM
 			case configtypes.TargetK8s:
 				discoveredPlugins[i].Target = configtypes.TargetK8s
 			}
