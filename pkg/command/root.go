@@ -52,10 +52,12 @@ func NewRootCmd() (*cobra.Command, error) {
 			contextCmd,
 			k8sCmd,
 			tmcCmd,
+			tsmCmd,
 		)
 		mapTargetToCmd := map[configtypes.Target]*cobra.Command{
 			configtypes.TargetK8s: k8sCmd,
 			configtypes.TargetTMC: tmcCmd,
+			configtypes.TargetTSM: tsmCmd,
 		}
 		if err := addPluginsToTarget(mapTargetToCmd); err != nil {
 			return nil, err
@@ -151,6 +153,15 @@ var tmcCmd = &cobra.Command{
 	Use:     "mission-control",
 	Short:   "Tanzu CLI plugins that target a Tanzu Mission Control endpoint",
 	Aliases: []string{"tmc"},
+	Annotations: map[string]string{
+		"group": string(plugin.TargetCmdGroup),
+	},
+}
+
+var tsmCmd = &cobra.Command{
+	Use:     "servicemesh",
+	Short:   "Tanzu CLI plugins that target a Tanzu Servicemesh endpoint",
+	Aliases: []string{"tsm"},
 	Annotations: map[string]string{
 		"group": string(plugin.TargetCmdGroup),
 	},
