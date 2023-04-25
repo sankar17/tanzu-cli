@@ -159,9 +159,9 @@ var tmcCmd = &cobra.Command{
 }
 
 var tsmCmd = &cobra.Command{
-	Use:     "servicemesh",
-	Short:   "Tanzu CLI plugins that target a Tanzu Servicemesh endpoint",
-	Aliases: []string{"tsm"},
+	Use:     "cosmos",
+	Short:   "Tanzu CLI plugins that target a TSM/COSMOS endpoint",
+	Aliases: []string{"cm"},
 	Annotations: map[string]string{
 		"group": string(plugin.TargetCmdGroup),
 	},
